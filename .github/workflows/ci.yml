@@ -47,7 +47,10 @@ jobs:
 
       - name: Install test dependencies
         run: |
-          pip3 install ansible molecule[docker] docker
+          pip3 install ansible
+          pip3 install "molecule>=6.0.0"
+          pip3 install "molecule-plugins[docker]>=23.0.0"
+          pip3 install docker
 
       - name: Create roles directory and link current role
         run: |
@@ -59,3 +62,8 @@ jobs:
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
+          MOLECULE_DISTRO: ${{ matrix.distro == 'debian12' && 'debian:12' || matrix.distro == 'ubuntu24' && 'ubuntu:24.04' || matrix.distro == 'fedora42' && 'fedora:42' || matrix.distro == 'rockylinux9' && 'rockylinux:9' || 'debian:12' }}
+          MOLECULE_DOCKER_COMMAND: ${{ contains(matrix.distro, 'fedora') && '/usr/lib/systemd/systemd' || contains(matrix.distro, 'rocky') && '/usr/lib/systemd/systemd' || '/lib/systemd/systemd' }}
+          MOLECULE_ANSIBLE_DISTRIBUTION: ${{ matrix.distro == 'debian12' && 'Debian' || matrix.distro == 'ubuntu24' && 'Ubuntu' || matrix.distro == 'fedora42' && 'Fedora' || matrix.distro == 'rockylinux9' && 'Rocky' || 'Debian' }}
+          MOLECULE_ANSIBLE_RELEASE: ${{ matrix.distro == 'debian12' && 'bookworm' || matrix.distro == 'ubuntu24' && 'noble' || matrix.distro == 'fedora42' && '42' || matrix.distro == 'rockylinux9' && '9' || 'bookworm' }}
+          MOLECULE_ANSIBLE_VERSION: ${{ matrix.distro == 'debian12' && '12' || matrix.distro == 'ubuntu24' && '24' || matrix.distro == 'fedora42' && '42' || matrix.distro == 'rockylinux9' && '9' || '12' }}
