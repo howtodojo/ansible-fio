@@ -1,5 +1,7 @@
 galaxy_info:
   author: Muhammad Panji
+  namespace: howtodojo
+  name: fio
   description: install fio
   company: howtodojo.com
   license: BSD
