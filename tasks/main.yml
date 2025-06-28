@@ -17,6 +17,8 @@
     cache_valid_time: "{{ apt_cache_valid_time | default(omit) }}"
     install_recommends: false
   when: ansible_os_family == "Debian"
+  retries: 3
+  delay: 10
 
 - name: Install fio packages (RHEL/CentOS/Rocky/AlmaLinux)
   become: true
@@ -24,6 +26,8 @@
     name: "{{ fio_packages }}"
     state: present
   when: ansible_os_family == "RedHat" and ansible_distribution != "Fedora"
+  retries: 3
+  delay: 10
 
 - name: Install fio packages (Fedora)
   become: true
@@ -31,9 +35,13 @@
     name: "{{ fio_packages }}"
     state: present
   when: ansible_distribution == "Fedora"
+  retries: 3
+  delay: 10
 
 - name: Verify fio installation
   ansible.builtin.command: fio --version
   register: fio_version_check
   changed_when: false
   failed_when: fio_version_check.rc != 0
+  retries: 2
+  delay: 5

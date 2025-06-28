@@ -2,42 +2,51 @@
 - name: Converge
   hosts: all
   become: true
+  gather_facts: true
   vars:
     ansible_python_interpreter: /usr/bin/python3
   vars_files:
     - ../../defaults/main.yml
     - ../../vars/main.yml
   pre_tasks:
+    - name: Debug system information
+      ansible.builtin.debug:
+        msg: |
+          Distribution: {{ ansible_distribution }}
+          OS Family: {{ ansible_os_family }}
+          Distribution Version: {{ ansible_distribution_version }}
+
     - name: Update apt cache (Debian/Ubuntu)
       ansible.builtin.apt:
         update_cache: true
         cache_valid_time: 600
       when: ansible_os_family == "Debian"
+      ignore_errors: true
 
     - name: Install Python3 and essential packages (Debian/Ubuntu)
       ansible.builtin.apt:
         name:
           - python3
-          - python3-apt
           - ca-certificates
         state: present
       when: ansible_os_family == "Debian"
+      ignore_errors: true
 
     - name: Install Python3 and essential packages (RHEL/CentOS/Rocky/AlmaLinux)
       ansible.builtin.yum:
         name:
           - python3
-          - ca-certificates
         state: present
       when: ansible_os_family == "RedHat" and ansible_distribution != "Fedora"
+      ignore_errors: true
 
     - name: Install Python3 and essential packages (Fedora)
       ansible.builtin.dnf:
         name:
           - python3
-          - ca-certificates
         state: present
       when: ansible_distribution == "Fedora"
+      ignore_errors: true
 
   tasks:
     - name: Include role tasks

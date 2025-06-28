@@ -56,7 +56,7 @@ jobs:
         run: echo "MOLECULE_PROJECT_DIRECTORY=${{ github.workspace }}" >> $GITHUB_ENV
 
       - name: Run Molecule tests
-        run: molecule test
+        run: molecule test --debug
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
