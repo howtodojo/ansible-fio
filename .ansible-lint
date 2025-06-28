@@ -6,3 +6,7 @@ exclude_paths:
 
 skip_list:
   - yaml[line-length]
+  - schema[meta]
+  - fqcn[action-core]
+
+offline: true

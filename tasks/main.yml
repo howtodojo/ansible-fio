@@ -3,7 +3,9 @@
 
 - name: Check for supported OS
   ansible.builtin.fail:
-    msg: "This role supports Debian, Ubuntu, Fedora, CentOS, RHEL, Rocky, and AlmaLinux distributions. Current: {{ ansible_distribution }}"
+    msg: >-
+      This role supports Debian, Ubuntu, Fedora, CentOS, RHEL, Rocky, and AlmaLinux distributions.
+      Current: {{ ansible_distribution }}
   when: ansible_distribution not in ['Debian', 'Ubuntu', 'CentOS', 'RedHat', 'Fedora', 'Rocky', 'AlmaLinux']
 
 - name: Install fio packages (Debian/Ubuntu)
