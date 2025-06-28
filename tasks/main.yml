@@ -1,18 +1,18 @@
 ---
 # tasks file for ansible-fio
 
-- block:
-    - name: Install fio packages
-      become: yes
-      apt:
-        name: "{{ item }}"
-        state: present
-        update_cache: yes
-        cache_valid_time: "{{ apt_cache_valid_time | default(omit) }}"
-        install_recommends: no
-      with_items:
-        - "{{ fio_packages }}"
-        
+- name: Check for supported OS
+  ansible.builtin.fail:
+    msg: "This role only supports Ubuntu."
+  when: ansible_distribution != 'Ubuntu'
+
+- name: Install fio packages
   become: yes
-  tags:
-    - fio
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+    cache_valid_time: "{{ apt_cache_valid_time | default(omit) }}"
+    install_recommends: no
+  with_items:
+    - "{{ fio_packages }}"

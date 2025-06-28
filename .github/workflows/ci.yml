@@ -1,0 +1,29 @@
+---
+name: CI
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the codebase.
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install test dependencies.
+        run: pip3 install ansible ansible-lint
+
+      - name: Lint code
+        run: ansible-lint
+
+      - name: Run ansible-playbook
+        run: |
+          ansible-playbook tests/test.yml -i tests/inventory --syntax-check
+          ansible-playbook -i tests/inventory tests/test.yml --connection=local
