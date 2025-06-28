@@ -3,16 +3,35 @@
 
 - name: Check for supported OS
   ansible.builtin.fail:
-    msg: "This role only supports Ubuntu."
-  when: ansible_distribution != 'Ubuntu'
+    msg: "This role supports Debian, Ubuntu, Fedora, CentOS, RHEL, Rocky, and AlmaLinux distributions. Current: {{ ansible_distribution }}"
+  when: ansible_distribution not in ['Debian', 'Ubuntu', 'CentOS', 'RedHat', 'Fedora', 'Rocky', 'AlmaLinux']
 
-- name: Install fio packages
+- name: Install fio packages (Debian/Ubuntu)
   become: true
   ansible.builtin.apt:
-    name: "{{ item }}"
+    name: "{{ fio_packages }}"
     state: present
     update_cache: true
     cache_valid_time: "{{ apt_cache_valid_time | default(omit) }}"
     install_recommends: false
-  with_items:
-    - "{{ fio_packages }}"
+  when: ansible_os_family == "Debian"
+
+- name: Install fio packages (RHEL/CentOS/Rocky/AlmaLinux)
+  become: true
+  ansible.builtin.yum:
+    name: "{{ fio_packages }}"
+    state: present
+  when: ansible_os_family == "RedHat" and ansible_distribution != "Fedora"
+
+- name: Install fio packages (Fedora)
+  become: true
+  ansible.builtin.dnf:
+    name: "{{ fio_packages }}"
+    state: present
+  when: ansible_distribution == "Fedora"
+
+- name: Verify fio installation
+  ansible.builtin.command: fio --version
+  register: fio_version_check
+  changed_when: false
+  failed_when: fio_version_check.rc != 0

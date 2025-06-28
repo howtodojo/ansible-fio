@@ -6,24 +6,54 @@ on:
     branches:
       - master
 jobs:
-  lint-and-test:
+  lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the codebase.
-        uses: actions/checkout@v2
+      - name: Check out the codebase
+        uses: actions/checkout@v4
 
-      - name: Set up Python 3.
-        uses: actions/setup-python@v2
+      - name: Set up Python 3
+        uses: actions/setup-python@v4
         with:
           python-version: "3.x"
 
-      - name: Install test dependencies.
-        run: pip3 install ansible ansible-lint
+      - name: Install test dependencies
+        run: |
+          pip3 install ansible ansible-lint yamllint
+          
+      - name: Lint YAML files
+        run: yamllint .
 
-      - name: Lint code
+      - name: Lint Ansible files
         run: ansible-lint
 
-      - name: Run ansible-playbook
+  molecule:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        distro:
+          - debian12
+          - ubuntu24
+          - fedora42
+          - rockylinux9
+    steps:
+      - name: Check out the codebase
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Install test dependencies
         run: |
-          ansible-playbook tests/test.yml -i tests/inventory --syntax-check
-          ansible-playbook -i tests/inventory tests/test.yml --connection=local
+          pip3 install ansible molecule[docker] docker
+
+      - name: Install role dependencies
+        run: ansible-galaxy install -r molecule/requirements.yml
+
+      - name: Run Molecule tests
+        run: molecule test
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'

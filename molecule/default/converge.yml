@@ -1,0 +1,40 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  pre_tasks:
+    - name: Update apt cache (Debian/Ubuntu)
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 600
+      when: ansible_os_family == "Debian"
+
+    - name: Install Python3 and essential packages (Debian/Ubuntu)
+      ansible.builtin.apt:
+        name:
+          - python3
+          - python3-apt
+          - ca-certificates
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Install Python3 and essential packages (RHEL/CentOS/Rocky/AlmaLinux)
+      ansible.builtin.yum:
+        name:
+          - python3
+          - ca-certificates
+        state: present
+      when: ansible_os_family == "RedHat" and ansible_distribution != "Fedora"
+
+    - name: Install Python3 and essential packages (Fedora)
+      ansible.builtin.dnf:
+        name:
+          - python3
+          - ca-certificates
+        state: present
+      when: ansible_distribution == "Fedora"
+
+  roles:
+    - role: howtodojo.fio

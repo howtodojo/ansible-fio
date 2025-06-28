@@ -2,6 +2,5 @@
 - name: "Test fio role"
   hosts: localhost
   become: true
-  roles_path: ../
   roles:
     - role: howtodojo.fio

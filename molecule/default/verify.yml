@@ -1,0 +1,53 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  tasks:
+    - name: Check if fio is installed
+      ansible.builtin.command: which fio
+      register: fio_which
+      changed_when: false
+
+    - name: Verify fio is in PATH
+      ansible.builtin.assert:
+        that:
+          - fio_which.rc == 0
+        fail_msg: "fio command not found in PATH"
+        success_msg: "fio is properly installed"
+
+    - name: Check fio version
+      ansible.builtin.command: fio --version
+      register: fio_version
+      changed_when: false
+
+    - name: Display fio version
+      ansible.builtin.debug:
+        var: fio_version.stdout
+
+    - name: Verify fio version output is not empty
+      ansible.builtin.assert:
+        that:
+          - fio_version.stdout is defined
+          - fio_version.stdout != ""
+        fail_msg: "fio version command failed"
+        success_msg: "fio version command works correctly"
+
+    - name: Test basic fio functionality
+      ansible.builtin.command: >
+        fio --name=test --ioengine=libaio --iodepth=1 --rw=randread
+        --bs=4k --direct=0 --size=1M --numjobs=1 --runtime=1
+        --group_reporting --filename=/tmp/fio-test
+      register: fio_test
+      changed_when: false
+
+    - name: Verify fio test completed successfully
+      ansible.builtin.assert:
+        that:
+          - fio_test.rc == 0
+        fail_msg: "fio test run failed"
+        success_msg: "fio test run completed successfully"
+
+    - name: Clean up test file
+      ansible.builtin.file:
+        path: /tmp/fio-test
+        state: absent
