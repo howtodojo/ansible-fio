@@ -7,12 +7,12 @@
   when: ansible_distribution != 'Ubuntu'
 
 - name: Install fio packages
-  become: yes
+  become: true
   ansible.builtin.apt:
     name: "{{ item }}"
     state: present
-    update_cache: yes
+    update_cache: true
     cache_valid_time: "{{ apt_cache_valid_time | default(omit) }}"
-    install_recommends: no
+    install_recommends: false
   with_items:
     - "{{ fio_packages }}"

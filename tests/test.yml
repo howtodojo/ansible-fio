@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
-  become: yes
+- name: "Test fio role"
+  hosts: localhost
+  become: true
   roles:
-    - ansible-fio
+    - role: howtodojo.fio
