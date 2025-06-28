@@ -5,13 +5,10 @@ platforms:
   - name: instance
     image: "${MOLECULE_DISTRO:-debian:12}"
     pre_build_image: true
-    privileged: true
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
-    cgroupns_mode: host
-    command: "${MOLECULE_DOCKER_COMMAND:-/lib/systemd/systemd}"
-    environment:
-      container: docker
+    command: /bin/bash -c "while true; do sleep 30; done"
+    tmpfs:
+      - /run
+      - /tmp
 provisioner:
   name: ansible
   inventory:
@@ -20,5 +17,6 @@ provisioner:
         ansible_distribution: "${MOLECULE_ANSIBLE_DISTRIBUTION:-Debian}"
         ansible_distribution_release: "${MOLECULE_ANSIBLE_RELEASE:-bookworm}"
         ansible_distribution_major_version: "${MOLECULE_ANSIBLE_VERSION:-12}"
+        ansible_connection: docker
 verifier:
   name: ansible
