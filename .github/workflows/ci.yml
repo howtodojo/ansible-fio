@@ -49,8 +49,10 @@ jobs:
         run: |
           pip3 install ansible molecule[docker] docker
 
-      - name: Install role dependencies
-        run: ansible-galaxy install -r molecule/requirements.yml
+      - name: Create roles directory and link current role
+        run: |
+          mkdir -p ~/.ansible/roles
+          ln -s ${{ github.workspace }} ~/.ansible/roles/howtodojo.fio
 
       - name: Run Molecule tests
         run: molecule test
