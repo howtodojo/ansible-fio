@@ -4,6 +4,9 @@
   become: true
   vars:
     ansible_python_interpreter: /usr/bin/python3
+  vars_files:
+    - ../../defaults/main.yml
+    - ../../vars/main.yml
   pre_tasks:
     - name: Update apt cache (Debian/Ubuntu)
       ansible.builtin.apt:
@@ -36,5 +39,6 @@
         state: present
       when: ansible_distribution == "Fedora"
 
-  roles:
-    - role: howtodojo.fio
+  tasks:
+    - name: Include role tasks
+      ansible.builtin.include_tasks: ../../tasks/main.yml
