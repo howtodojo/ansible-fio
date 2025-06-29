@@ -45,6 +45,7 @@
   register: fedora_raw_result
   retries: 2
   delay: 5
+  changed_when: true
 
 - name: Verify Fedora installation succeeded
   ansible.builtin.fail:
