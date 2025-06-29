@@ -34,6 +34,25 @@
   when: ansible_distribution == "Fedora"
   retries: 3
   delay: 10
+  ignore_errors: true
+  register: fedora_dnf_result
+
+- name: Install fio packages (Fedora) using raw dnf as fallback
+  ansible.builtin.raw: dnf install -y {{ fio_packages | join(' ') }}
+  when: 
+    - ansible_distribution == "Fedora"
+    - fedora_dnf_result is failed
+  register: fedora_raw_result
+  retries: 2
+  delay: 5
+
+- name: Verify Fedora installation succeeded
+  ansible.builtin.fail:
+    msg: "Failed to install FIO on Fedora using both dnf module and raw dnf"
+  when:
+    - ansible_distribution == "Fedora" 
+    - fedora_dnf_result is failed
+    - fedora_raw_result is failed
 
 - name: Verify fio installation
   ansible.builtin.command: fio --version
