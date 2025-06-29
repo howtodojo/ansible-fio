@@ -1,7 +1,6 @@
 fio
 =========
-
-[![Build Status](https://travis-ci.org/howtodojo/ansible-fio.svg?branch=master)](https://travis-ci.org/howtodojo/ansible-fio)
+![](https://github.com/howtodojo/ansible-fio/actions/workflows/ci.yml/badge.svg)
 
 This role will install fio
 
