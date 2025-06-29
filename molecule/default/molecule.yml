@@ -18,5 +18,7 @@ provisioner:
         ansible_distribution_release: "${MOLECULE_ANSIBLE_RELEASE:-bookworm}"
         ansible_distribution_major_version: "${MOLECULE_ANSIBLE_VERSION:-12}"
         ansible_connection: docker
+        ansible_user: root
+        ansible_become: false
 verifier:
   name: ansible

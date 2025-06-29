@@ -9,7 +9,6 @@
   when: ansible_distribution not in ['Debian', 'Ubuntu', 'CentOS', 'RedHat', 'Fedora', 'Rocky', 'AlmaLinux']
 
 - name: Install fio packages (Debian/Ubuntu)
-  become: true
   ansible.builtin.apt:
     name: "{{ fio_packages }}"
     state: present
@@ -21,7 +20,6 @@
   delay: 10
 
 - name: Install fio packages (RHEL/CentOS/Rocky/AlmaLinux)
-  become: true
   ansible.builtin.yum:
     name: "{{ fio_packages }}"
     state: present
@@ -30,7 +28,6 @@
   delay: 10
 
 - name: Install fio packages (Fedora)
-  become: true
   ansible.builtin.dnf:
     name: "{{ fio_packages }}"
     state: present
