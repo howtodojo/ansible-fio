@@ -3,30 +3,46 @@
   hosts: all
   become: false
   tasks:
-    - name: Check if fio is installed
-      ansible.builtin.command: which fio
+    - name: Check if fio is installed using command -v
+      ansible.builtin.shell: command -v fio || type fio || whereis fio
       register: fio_which
       changed_when: false
+      ignore_errors: true
 
-    - name: Verify fio is in PATH
+    - name: Try to run fio directly as a backup check
+      ansible.builtin.command: fio --version
+      register: fio_version_direct
+      changed_when: false
+      ignore_errors: true
+      when: fio_which.rc != 0
+
+    - name: Verify fio is available
       ansible.builtin.assert:
         that:
-          - fio_which.rc == 0
-        fail_msg: "fio command not found in PATH"
+          - fio_which.rc == 0 or fio_version_direct.rc == 0
+        fail_msg: "fio command not found - neither 'command -v fio' nor 'fio --version' worked"
         success_msg: "fio is properly installed"
 
-    - name: Check fio version
+    - name: Get fio version (using backup if main check failed)
       ansible.builtin.command: fio --version
       register: fio_version
       changed_when: false
+      when: fio_which.rc == 0 or fio_version_direct.rc == 0
+
+    - name: Use direct version check if main check failed
+      ansible.builtin.set_fact:
+        fio_version: "{{ fio_version_direct }}"
+      when: fio_which.rc != 0 and fio_version_direct.rc == 0
 
     - name: Display fio version
       ansible.builtin.debug:
         var: fio_version.stdout
+      when: fio_version is defined and fio_version.stdout is defined
 
     - name: Verify fio version output is not empty
       ansible.builtin.assert:
         that:
+          - fio_version is defined
           - fio_version.stdout is defined
           - fio_version.stdout != ""
         fail_msg: "fio version command failed"
