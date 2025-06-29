@@ -39,7 +39,7 @@
 
 - name: Install fio packages (Fedora) using raw dnf as fallback
   ansible.builtin.raw: dnf install -y {{ fio_packages | join(' ') }}
-  when: 
+  when:
     - ansible_distribution == "Fedora"
     - fedora_dnf_result is failed
   register: fedora_raw_result
@@ -50,7 +50,7 @@
   ansible.builtin.fail:
     msg: "Failed to install FIO on Fedora using both dnf module and raw dnf"
   when:
-    - ansible_distribution == "Fedora" 
+    - ansible_distribution == "Fedora"
     - fedora_dnf_result is failed
     - fedora_raw_result is failed
 
